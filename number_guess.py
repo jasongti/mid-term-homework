@@ -4,18 +4,24 @@ import random
 
 # 读取用户历史成绩
 def get_user_score(user_name):
-    with open('user_record.txt','r') as f:
+    # 尝试打开文件，没有则创建新文件
+    try:
+        f = open('user_record.txt','r')
+    except IOError:
+        f = open('user_record.txt','w')
+    finally:
         score_record = {}
         for i in f.readlines():
             data = i.split()
             score_record[data[0]] = [float(k) for k in data[1:]]
-    # 判断用户是否为新用户
-    if not score_record.get(user_name):
-        print '你好 %s，祝你游戏愉快' %user_name
-        score_record[user_name] = [0,0]
-    else:
-        print '欢迎回来 %s,祝你游戏愉快' %user_name
-    return score_record
+        f.close()
+        # 判断用户是否为新用户
+        if not score_record.get(user_name):
+            print '你好 %s，祝你游戏愉快' %user_name
+            score_record[user_name] = [0,0]
+        else:
+            print '欢迎回来 %s,祝你游戏愉快' %user_name
+        return score_record
 
 # 猜数字
 def guess_number(roundtimes,averagetimes):
