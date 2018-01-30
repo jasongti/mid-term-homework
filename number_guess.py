@@ -2,7 +2,7 @@
 
 import random
 
-def username(user_name):
+def get_score_report(user_name):
     with open('user_record.txt','r') as f:
         score_record = {}
         for i in f.readlines():
@@ -15,7 +15,7 @@ def username(user_name):
         print '欢迎回来 %s,祝你游戏愉快' %user_name
     return score_record
 
-def guessnumber(roundtimes,averagetimes):
+def guess_number(roundtimes,averagetimes):
     while True:
         goal = random.randint(1,100)
         totaltimes = roundtimes * averagetimes
@@ -43,13 +43,16 @@ def guessnumber(roundtimes,averagetimes):
             break
     return (roundtimes,averagetimes)
 
-if __name__ == '__main__':
-    user_name = raw_input('请输入玩家姓名：\n')
-    score_record = username(user_name)
-    game_result = guessnumber(score_record[user_name][0],score_record[user_name][1])
-    score_record[user_name] = [int(game_result[0]),game_result[1]]
+def set_data(score_record):
     with open('user_record.txt','w') as f:
         for i in score_record:
             score_list = [i]+score_record[i]
             f.write(' '.join('%s' %id for id in score_list))
             f.write('\n')
+
+if __name__ == '__main__':
+    user_name = raw_input('请输入玩家姓名：\n')
+    score_record = get_score_report(user_name)
+    game_result = guess_number(score_record[user_name][0],score_record[user_name][1])
+    score_record[user_name] = [int(game_result[0]),game_result[1]]
+    set_data(score_record)
