@@ -2,12 +2,15 @@
 
 import random
 
+# 读取用户历史成绩
 def get_score_report(user_name):
+    # 以追加读写的方式打开，文件不存在时新建文件
     with open('user_record.txt','a+') as f:
         score_record = {}
         for i in f.readlines():
             data = i.split()
             score_record[data[0]] = [float(k) for k in data[1:]]
+    # 判断用户是否为新用户
     if not score_record.get(user_name):
         print '你好 %s，祝你游戏愉快' %user_name
         score_record[user_name] = [0,0]
@@ -15,6 +18,7 @@ def get_score_report(user_name):
         print '欢迎回来 %s,祝你游戏愉快' %user_name
     return score_record
 
+# 猜数字
 def guess_number(roundtimes,averagetimes):
     while True:
         goal = random.randint(1,100)
@@ -35,14 +39,17 @@ def guess_number(roundtimes,averagetimes):
         totaltimes += times
         averagetimes = round(float(totaltimes)/roundtimes,2)
         print '你猜中答案一共用了%d次机会\n你一共玩了%d次游戏\n你平均%.2f次猜中答案\n' %(times,roundtimes,averagetimes)
+        # 继续游戏判断
         go = raw_input('输入"go"再玩一次，否则退出游戏\n')
         if go == 'go':
             continue
         else:
             print '再见\n'
             break
+    # 返回用户成绩（元组）
     return (roundtimes,averagetimes)
 
+# 更新用户成绩
 def set_data(score_record):
     with open('user_record.txt','w') as f:
         for i in score_record:
