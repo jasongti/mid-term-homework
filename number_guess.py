@@ -3,9 +3,8 @@
 import random
 
 # 读取用户历史成绩
-def get_score_report(user_name):
-    # 以追加读写的方式打开，文件不存在时新建文件
-    with open('user_record.txt','a+') as f:
+def get_user_score(user_name):
+    with open('user_record.txt','r') as f:
         score_record = {}
         for i in f.readlines():
             data = i.split()
@@ -22,12 +21,20 @@ def get_score_report(user_name):
 def guess_number(roundtimes,averagetimes):
     while True:
         goal = random.randint(1,100)
+        # 计算用户历史总猜测次数
         totaltimes = roundtimes * averagetimes
         times = 0
         print '猜猜数字是几：1~100\n'
         while True:
             times += 1
-            number = input('第%d次\n' %times)
+            print '第%d次' %times
+            while True:
+                try:
+                    number = int(raw_input())
+                except:
+                    print '请输入1-100之间的整数~\n'
+                else:
+                    break
             if goal < number:
                 print '太大了'
             elif goal > number:
@@ -37,6 +44,7 @@ def guess_number(roundtimes,averagetimes):
                 roundtimes += 1
                 break
         totaltimes += times
+        # 计算用户当前猜测平均次数
         averagetimes = round(float(totaltimes)/roundtimes,2)
         print '你猜中答案一共用了%d次机会\n你一共玩了%d次游戏\n你平均%.2f次猜中答案\n' %(times,roundtimes,averagetimes)
         # 继续游戏判断
@@ -58,8 +66,17 @@ def set_data(score_record):
             f.write('\n')
 
 if __name__ == '__main__':
-    user_name = raw_input('请输入玩家姓名：\n')
-    score_record = get_score_report(user_name)
+    while True:
+        # 防止用户输入空姓名
+        try:
+            user_name = raw_input('请输入玩家姓名：\n')
+            if user_name == '':
+                raise TypeError
+        except TypeError:
+            print '玩家姓名不能为空~'
+        else:
+            break
+    score_record = get_user_score(user_name)
     game_result = guess_number(score_record[user_name][0],score_record[user_name][1])
     score_record[user_name] = [int(game_result[0]),game_result[1]]
     set_data(score_record)
