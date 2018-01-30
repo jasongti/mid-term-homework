@@ -3,7 +3,7 @@
 import random
 
 def get_score_report(user_name):
-    with open('user_record.txt','r') as f:
+    with open('user_record.txt','a+') as f:
         score_record = {}
         for i in f.readlines():
             data = i.split()
