@@ -8,7 +8,7 @@ def get_user_score(user_name):
     try:
         f = open('user_record.txt','r')
     except IOError:
-        f = open('user_record.txt','w')
+        f = open('user_record.txt','w+')
     finally:
         score_record = {}
         for i in f.readlines():
