@@ -52,7 +52,7 @@ def search_from_balance():
     i = len(data)
     if i > 1:
         latest_balance = data[-1].split()
-        print '最新资产：%s\n最新负债：%s万\n最新净资产：%s万\n最后更新时间：%s\n' %(latest_balance[0],latest_balance[1],latest_balance[2],latest_balance[3])
+        print '最新资产：%s\n最新负债：%s万\n最新净资产：%s万\n最后更新时间：%s\n' %(latest_balance[1],latest_balance[2],latest_balance[3],latest_balance[0])
     else:
         print '无记录'
 
@@ -87,7 +87,7 @@ def write_in_balance(balance_sheet):
         for i in balance_sheet:
             f.write(' '.join([str(k) for k in i]))
             f.write('\n')
-    print '已成功记录\n'
+    return 0
 
 if __name__ == '__main__':
     while True:
@@ -114,7 +114,9 @@ if __name__ == '__main__':
             print '记账模式'
             new_record = add_bill()
             write_in_bill(new_record)
-            write_in_balance(update_balance(new_record))
+            if write_in_balance(update_balance(new_record)) == 0:
+                print '\n交易已成功记录'
+                search_from_balance()
         elif user_choice_mode == 3:
             print '谢谢使用，再见'
             break
