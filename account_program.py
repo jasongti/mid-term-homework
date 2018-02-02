@@ -2,7 +2,9 @@
 
 import datetime
 
+# 新增流水账
 def add_bill():
+    # 获取当前时间
     i = datetime.datetime.now()
     now_time = '%s-%s-%s' %(i.year,i.month,i.day)
     to_company = raw_input('交易对象：')
@@ -13,9 +15,11 @@ def add_bill():
     new_record = [to_company,income,pay,for_income,for_pay,now_time]
     return new_record
 
+# 查询流水账，可按最近记录查询、公司名称查询
 def search_from_bill(type,*company):
     with open('bill.txt','r') as f:
         bill = f.readlines()
+    # 模式1，按最近记录查询
     if type == 1:
         i = len(bill)
         if i > 10:
@@ -23,39 +27,48 @@ def search_from_bill(type,*company):
             for k in result:
                 print k,
             print
+        # 不足10条时显示全部
         else:
             print '当前共有%d条记录' %(i-1)
             for k in bill:
                 print k,
             print
+    # 模式2，按公司名称查询
     elif type == 2:
         company_bill_list = []
         for i in bill:
             if company[0] == i.split()[0]:
                 company_bill_list.append(i)
+        # 有历史记录
         if len(company_bill_list) > 0:
             company_bill_list.insert(0,bill[0])
             for k in company_bill_list:
                 print k,
             print
+        # 无历史记录
         else:
             print '暂无与%s的交易记录' %company
 
+# 写入流水账文档
 def write_in_bill(bill_record):
     with open('bill.txt','a') as f:
         f.write('\n')
         f.write(' '.join(bill_record))
 
+# 查询资产负债表
 def search_from_balance():
     with open('balance_sheet.txt','r') as f:
         data = f.readlines()
     i = len(data)
+    # 有历史记录
     if i > 1:
         latest_balance = data[-1].split()
         print '最新资产：%s\n最新负债：%s万\n最新净资产：%s万\n最后更新时间：%s\n' %(latest_balance[1],latest_balance[2],latest_balance[3],latest_balance[0])
+    # 无历史记录
     else:
         print '无记录'
 
+# 更新资产负债表
 def update_balance(bill_record):
     balance_sheet_date = []
     balance_sheet = []
@@ -66,22 +79,27 @@ def update_balance(bill_record):
             balance_sheet_date.append(data[0])
             balance_sheet.append(data)
     i = datetime.datetime.now()
+    # 初始化
     if len(balance_sheet) == 1:
         add_initial_data.append('%s-%s-%s' %(i.year, i.month, i.day))
         add_initial_data += [0,0,0]
         balance_sheet.append(add_initial_data)
         balance_sheet_date.append(add_initial_data[0])
+    # 取最新一条记录
     goal_data = balance_sheet[-1][:]
     goal_data[1] = float(goal_data[1]) + float(bill_record[1]) - float(bill_record[2])
     goal_data[2] = float(goal_data[2]) + float(bill_record[4]) - float(bill_record[3])
     goal_data[3] = goal_data[1] - goal_data[2]
+    # 当天已有更新，更新记录
     if bill_record[5] in balance_sheet_date:
         balance_sheet[-1] = goal_data
+    # 当天无更新，新增记录
     else:
         goal_data[0] = '%s-%s-%s' %(i.year,i.month,i.day)
         balance_sheet.append(goal_data)
     return balance_sheet
 
+# 写入资产负债文档
 def write_in_balance(balance_sheet):
     with open('balance_sheet.txt','w') as f:
         for i in balance_sheet:
@@ -114,9 +132,12 @@ if __name__ == '__main__':
             print '记账模式'
             new_record = add_bill()
             write_in_bill(new_record)
+            # 记账成功显示最新信息
             if write_in_balance(update_balance(new_record)) == 0:
                 print '\n交易已成功记录'
                 search_from_balance()
+            else:
+                print '记录交易失败'
         elif user_choice_mode == 3:
             print '谢谢使用，再见'
             break
