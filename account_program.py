@@ -5,15 +5,22 @@ import datetime
 # 新增流水账
 def add_bill():
     # 获取当前时间
-    i = datetime.datetime.now()
-    now_time = '%s-%s-%s' %(i.year,i.month,i.day)
+    now = datetime.datetime.now()
+    now_time = '%s-%s-%s' %(now.year,now.month,now.day)
     to_company = raw_input('交易对象：')
-    income = raw_input('收入/万：')
-    pay = raw_input('支出/万：')
-    for_income = raw_input('应收账款/万：')
-    for_pay = raw_input('应付账款/万：')
-    new_record = [to_company,income,pay,for_income,for_pay,now_time]
-    return new_record
+    while True:
+        try:
+            income = input('收入/万：')
+            pay = input('支出/万：')
+            for_income = input('应收账款/万：')
+            for_pay = input('应付账款/万：')
+        except:
+            print '请输入正确的信息~'
+            continue
+        else:
+            new_record = [to_company,income,pay,for_income,for_pay,now_time]
+            break
+    return [str(i) for i in new_record]
 
 # 查询流水账，可按最近记录查询、公司名称查询
 def search_from_bill(type,*company):
@@ -89,6 +96,7 @@ def update_balance(bill_record):
     balance_sheet_date = []
     balance_sheet = []
     add_initial_data = []
+    now = datetime.datetime.now()
     with open('balance_sheet.txt','a+') as f:
         f.seek(0)
         for i in f.readlines():
@@ -96,14 +104,12 @@ def update_balance(bill_record):
             # 将结算日期与对应的数据，按照相同顺序一一对应，分别存储在两个list中
             balance_sheet_date.append(data[0])
             balance_sheet.append(data)
-        # 初始化文档
-        if len(balance_sheet) == 0:
-            f.write('结算日期 资产/w 负债/w 净资产/w\n')
-    i = datetime.datetime.now()
-    # 初始化数据
+    # 初始化文档
+    while len(balance_sheet) == 0:
+        balance_sheet.append(['结算日期', '资产/w', '负债/w', '净资产/w'])
     if len(balance_sheet) == 1:
-        add_initial_data.append('%s-%s-%s' %(i.year, i.month, i.day))
-        add_initial_data += [0,0,0]
+        add_initial_data.append('%s-%s-%s' % (now.year, now.month, now.day))
+        add_initial_data += [0, 0, 0]
         balance_sheet.append(add_initial_data)
         balance_sheet_date.append(add_initial_data[0])
     # 取最新一条记录
@@ -116,7 +122,7 @@ def update_balance(bill_record):
         balance_sheet[-1] = goal_data
     # 当天无更新，新增记录
     else:
-        goal_data[0] = '%s-%s-%s' %(i.year,i.month,i.day)
+        goal_data[0] = '%s-%s-%s' %(now.year,now.month,now.day)
         balance_sheet.append(goal_data)
     return balance_sheet
 
@@ -131,37 +137,47 @@ def write_in_balance(balance_sheet):
 if __name__ == '__main__':
     while True:
         print '1.查账； 2.记账; 3.退出'
-        user_choice_mode = input('请选择服务：')
-        if user_choice_mode == 1:
-            print '查账模式'
-            while True:
-                print '1.查询最近十笔交易记录\n2.查询与某公司交易往来\n3.查询最近资产负债情况\n4.返回上一级\n'
-                user_choice_number = input('请选择服务：')
-                if user_choice_number == 1:
-                    search_from_bill(1)
-                elif user_choice_number == 2:
-                    company = raw_input('请输入公司名称：')
-                    search_from_bill(2,company)
-                elif user_choice_number == 3:
-                    search_from_balance()
-                elif user_choice_number == 4:
-                    break
-                else:
-                    print '请输入正确的服务编号\n'
-                    continue
-        elif user_choice_mode == 2:
-            print '记账模式'
-            new_record = add_bill()
-            write_in_bill(new_record)
-            # 记账成功显示最新信息
-            if write_in_balance(update_balance(new_record)) == 0:
-                print '\n交易已成功记录'
-                search_from_balance()
-            else:
-                print '记录交易失败'
-        elif user_choice_mode == 3:
-            print '谢谢使用，再见'
-            break
-        else:
-            print '请输入正确的服务编号\n'
+        try:
+            user_choice_mode = input('请选择服务：')
+        except:
+            print '请输入正确的服务编号~'
             continue
+        else:
+            if user_choice_mode == 1:
+                print '查账模式'
+                while True:
+                    print '1.查询最近十笔交易记录\n2.查询与某公司交易往来\n3.查询最近资产负债情况\n4.返回上一级\n'
+                    try:
+                        user_choice_number = input('请选择服务：')
+                    except:
+                        print '请输入正确的服务编号~'
+                        continue
+                    else:
+                        if user_choice_number == 1:
+                            search_from_bill(1)
+                        elif user_choice_number == 2:
+                            company = raw_input('请输入公司名称：')
+                            search_from_bill(2,company)
+                        elif user_choice_number == 3:
+                            search_from_balance()
+                        elif user_choice_number == 4:
+                            break
+                        else:
+                            print '请输入正确的服务编号\n'
+                            continue
+            elif user_choice_mode == 2:
+                print '记账模式'
+                new_record = add_bill()
+                write_in_bill(new_record)
+                # 记账成功显示最新信息
+                if write_in_balance(update_balance(new_record)) == 0:
+                    print '\n交易已成功记录'
+                    search_from_balance()
+                else:
+                    print '记录交易失败'
+            elif user_choice_mode == 3:
+                print '谢谢使用，再见'
+                break
+            else:
+                print '请输入正确的服务编号\n'
+                continue
